@@ -62,10 +62,13 @@ public class Player extends GameObject implements Movable, TakeVisitor {
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         GameObject next = game.grid().get(nextPos);
-        if (next instanceof Decor decor) {
-            return decor.walkableBy(this);
+        if (game.grid().inside(nextPos)) {
+            if (next instanceof Decor decor) {
+                return decor.walkableBy(this);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public void update(long now) {
