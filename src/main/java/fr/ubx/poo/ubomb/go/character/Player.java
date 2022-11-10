@@ -50,6 +50,10 @@ public class Player extends GameObject implements Movable, TakeVisitor {
         return lives;
     }
 
+    public void updateLives(int delta) {
+        this.lives += delta;
+    }
+
     public Direction getDirection() {
         return direction;
     }

@@ -14,6 +14,11 @@ public class Heart extends Bonus {
     }
 
     @Override
+    public void takenBy(Player player) {
+        player.updateLives(1);
+    }
+
+    @Override
     public void explode() {}
 
 }
