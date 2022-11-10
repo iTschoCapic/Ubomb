@@ -9,6 +9,11 @@ public class Heart extends Bonus {
     }
 
     @Override
+    public boolean walkableBy(Player player) {
+        return true;
+    }
+
+    @Override
     public void explode() {}
 
 }
