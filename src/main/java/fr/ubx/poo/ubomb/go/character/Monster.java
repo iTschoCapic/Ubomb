@@ -10,5 +10,11 @@ import fr.ubx.poo.ubomb.go.TakeVisitor;
 import fr.ubx.poo.ubomb.go.decor.bonus.*;
 
 public class Monster extends GameObject {
-    
+
+    private Direction direction;
+
+    public Monster(Position position) {
+        super(position);
+        this.direction = Direction.DOWN;
+    }
 }
