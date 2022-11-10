@@ -7,11 +7,12 @@ package fr.ubx.poo.ubomb.engine;
 import fr.ubx.poo.ubomb.game.Direction;
 import fr.ubx.poo.ubomb.game.Game;
 import fr.ubx.poo.ubomb.game.Position;
-import fr.ubx.poo.ubomb.go.character.Player;
+import fr.ubx.poo.ubomb.go.character.*;
 import fr.ubx.poo.ubomb.view.ImageResource;
 import fr.ubx.poo.ubomb.view.Sprite;
 import fr.ubx.poo.ubomb.view.SpriteFactory;
 import fr.ubx.poo.ubomb.view.SpritePlayer;
+import fr.ubx.poo.ubomb.view.SpriteMonster;
 import javafx.animation.AnimationTimer;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -81,6 +82,8 @@ public final class GameEngine {
         }
 
         sprites.add(new SpritePlayer(layer, player));
+        Monster monster = new Monster(player.getPosition());
+        sprites.add(new SpriteMonster(layer, monster));
     }
 
     void buildAndSetGameLoop() {

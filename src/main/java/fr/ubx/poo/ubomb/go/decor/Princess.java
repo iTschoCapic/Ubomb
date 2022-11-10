@@ -1,4 +1,4 @@
-package fr.ubx.poo.ubomb.go.character;
+package fr.ubx.poo.ubomb.go.decor;
 
 import fr.ubx.poo.ubomb.engine.Timer;
 import fr.ubx.poo.ubomb.game.Direction;
@@ -8,14 +8,12 @@ import fr.ubx.poo.ubomb.go.GameObject;
 import fr.ubx.poo.ubomb.go.Movable;
 import fr.ubx.poo.ubomb.go.TakeVisitor;
 import fr.ubx.poo.ubomb.go.decor.bonus.*;
+import fr.ubx.poo.ubomb.go.character.*;
 
-public class Princess extends GameObject {
-
-    private Direction direction;
+public class Princess extends Decor {
 
     public Princess(Position position) {
         super(position);
-        this.direction = Direction.DOWN;
     }
 
     @Override

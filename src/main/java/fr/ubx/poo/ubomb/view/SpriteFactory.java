@@ -25,6 +25,8 @@ public final class SpriteFactory {
             return new Sprite(layer, BOX.getImage(), gameObject);
         if (gameObject instanceof Heart)
             return new Sprite(layer, HEART.getImage(), gameObject);
+        if (gameObject instanceof Princess)
+            return new Sprite(layer, PRINCESS.getImage(), gameObject);
         throw new RuntimeException("Unsupported sprite for decor " + gameObject);
     }
 }

@@ -18,6 +18,10 @@ public class Monster extends GameObject {
         this.direction = Direction.DOWN;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
     @Override
     public boolean walkableBy(Player player) {
         return true;
