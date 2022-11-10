@@ -17,4 +17,9 @@ public class Princess extends GameObject {
         super(position);
         this.direction = Direction.DOWN;
     }
+
+    @Override
+    public boolean walkableBy(Player player) {
+        return true;
+    }
 }

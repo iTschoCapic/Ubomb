@@ -18,7 +18,7 @@ public class Player extends GameObject implements Movable, TakeVisitor {
 
     private Direction direction;
     private boolean moveRequested = false;
-    private final int lives;
+    private int lives;
 
     public Player(Game game, Position position) {
         super(game, position);
@@ -37,7 +37,10 @@ public class Player extends GameObject implements Movable, TakeVisitor {
         Position nextPos = direction.nextPosition(getPosition());
         GameObject next = game.grid().get(nextPos);
         if (next instanceof Bonus bonus) {
-                bonus.takenBy(this);
+            bonus.takenBy(this);
+        }
+        else if (next instanceof Monster monster) {
+            this.lives--;
         }
         setPosition(nextPos);
     }
