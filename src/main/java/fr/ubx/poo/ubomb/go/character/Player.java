@@ -19,6 +19,8 @@ public class Player extends GameObject implements Movable, TakeVisitor {
     private Direction direction;
     private boolean moveRequested = false;
     private int lives;
+    private int availableBombs;
+    private int keys;
 
     public Player(Game game, Position position) {
         super(game, position);
@@ -40,7 +42,7 @@ public class Player extends GameObject implements Movable, TakeVisitor {
             bonus.takenBy(this);
         }
         else if (next instanceof Monster monster) {
-            this.lives--;
+            this.updateLives(-1);
         }
         setPosition(nextPos);
     }
@@ -48,6 +50,14 @@ public class Player extends GameObject implements Movable, TakeVisitor {
 
     public int getLives() {
         return lives;
+    }
+
+    public int getAvailableBombs() {
+        return availableBombs;
+    }
+
+    public int getKeys() {
+        return keys;
     }
 
     public void updateLives(int delta) {
