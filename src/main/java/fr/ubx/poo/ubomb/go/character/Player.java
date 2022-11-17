@@ -44,7 +44,6 @@ public class Player extends GameObject implements Movable, TakeVisitor {
         setPosition(nextPos);
     }
 
-
     public int getLives() {
         return lives;
     }
@@ -75,10 +74,10 @@ public class Player extends GameObject implements Movable, TakeVisitor {
 
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
-        GameObject next = game.grid().get(nextPos);
+        Decor next = game.grid().get(nextPos);
         if (game.grid().inside(nextPos)) {
-            if (next instanceof Decor decor) {
-                return decor.walkableBy(this);
+            if (next != null) {
+                return next.walkableBy(this);
             }
             return true;
         }
@@ -92,6 +91,17 @@ public class Player extends GameObject implements Movable, TakeVisitor {
             }
         }
         moveRequested = false;
+    }
+
+    public void useKey() {
+        Position nextPos = this.getDirection().nextPosition(getPosition());
+        GameObject next = game.grid().get(nextPos);
+        if (next instanceof Door) {
+            if (!((Door)next).isOpen()) {
+                keys--;
+                ((Door)next).open();
+            }
+        }
     }
 
     @Override
