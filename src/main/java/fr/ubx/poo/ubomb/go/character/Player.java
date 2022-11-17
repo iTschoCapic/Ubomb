@@ -31,7 +31,7 @@ public class Player extends GameObject implements Movable, TakeVisitor {
 
     @Override
     public void take(Key key) {
-        System.out.println("Take the key ...");
+        this.keys++;
     }
 
     public void doMove(Direction direction) {

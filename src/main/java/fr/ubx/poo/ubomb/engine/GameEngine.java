@@ -13,6 +13,7 @@ import fr.ubx.poo.ubomb.view.Sprite;
 import fr.ubx.poo.ubomb.view.SpriteFactory;
 import fr.ubx.poo.ubomb.view.SpritePlayer;
 import fr.ubx.poo.ubomb.view.SpriteMonster;
+import fr.ubx.poo.ubomb.go.GameObject;
 import javafx.animation.AnimationTimer;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -39,6 +40,8 @@ public final class GameEngine {
     private static AnimationTimer gameLoop;
     private final Game game;
     private final Player player;
+    private final Monster monster;
+    private boolean isOnMonster;
     private final List<Sprite> sprites = new LinkedList<>();
     private final Set<Sprite> cleanUpSprites = new HashSet<>();
     private final Stage stage;
@@ -50,6 +53,8 @@ public final class GameEngine {
         this.stage = stage;
         this.game = game;
         this.player = game.player();
+        this.monster = game.monster();
+        this.isOnMonster = false;
         initialize();
         buildAndSetGameLoop();
     }
@@ -82,7 +87,6 @@ public final class GameEngine {
         }
 
         sprites.add(new SpritePlayer(layer, player));
-        Monster monster = new Monster(player.getPosition());
         sprites.add(new SpriteMonster(layer, monster));
     }
 
@@ -129,7 +133,15 @@ public final class GameEngine {
     }
 
     private void checkCollision(long now) {
-        // Check a collision between a monster and the player
+        List<GameObject> gameObjects = game.getGameObjects(player.getPosition());
+        if (gameObjects.contains(player) && gameObjects.contains(monster)) {
+            if (!isOnMonster) {
+                player.updateLives(-1);
+                isOnMonster = true;
+            }
+        }
+        else
+            isOnMonster = false;
     }
 
     private void processInput(long now) {
