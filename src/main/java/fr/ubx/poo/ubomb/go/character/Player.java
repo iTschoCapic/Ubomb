@@ -35,14 +35,11 @@ public class Player extends GameObject implements Movable, TakeVisitor {
     }
 
     public void doMove(Direction direction) {
-        // This method is called only if the move is possible, do not check again
+    // This method is called only if the move is possible, do not check again
         Position nextPos = direction.nextPosition(getPosition());
-        GameObject next = game.grid().get(nextPos);
-        if (next instanceof Bonus bonus) {
-            bonus.takenBy(this);
-        }
-        else if (next instanceof Monster monster) {
-            this.updateLives(-1);
+        Decor next = game.grid().get(nextPos);
+        if (next != null) {
+            next.takenBy(this);
         }
         setPosition(nextPos);
     }

@@ -9,7 +9,7 @@ import fr.ubx.poo.ubomb.go.Takeable;
 import fr.ubx.poo.ubomb.go.character.Player;
 import fr.ubx.poo.ubomb.go.decor.Decor;
 
-public abstract class Bonus extends Decor implements Takeable {
+public abstract class Bonus extends Decor {
     public Bonus(Position position) {
         super(position);
     }
