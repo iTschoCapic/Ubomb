@@ -35,6 +35,14 @@ public class GameLauncherView extends BorderPane {
         return Boolean.parseBoolean(config.getProperty(name, Boolean.toString(defaultValue)));
     }
 
+    /*private Position playerProperty(Properties config, String name, String defaultValue) {
+        return Position.parsePosition(config.getProperty(name, String.toString(defaultValue))); // 0x0
+    }*/
+
+    private String worldProperty(Properties config, String name, String defaultValue) {
+        return config.getProperty(name, defaultValue);
+    }
+
     public GameLauncherView(Stage stage)  {
         MapRepoStringRLE mapRepoStringRLE = new MapRepoStringRLE();
         // Create menu
@@ -68,13 +76,26 @@ public class GameLauncherView extends BorderPane {
                     Properties config = new Properties();
                     try {
                         config.load(in);
+                        //Position playerPosition = playerProperty(config, "player", "0x0");
+                        boolean compression = booleanProperty(config, "compression", false);
                         int bombBagCapacity = integerProperty(config, "bombBagCapacity", 3);
                         int playerLives = integerProperty(config, "playerLives", 5);
                         long playerInvisibilityTime = longProperty(config, "playerInvisibilityTime", 4000);
                         int monsterVelocity = integerProperty(config, "monsterVelocity", 5);
                         long monsterInvisibilityTime = longProperty(config, "monsterInvisibilityTime", 1000);
                         Configuration configuration = new Configuration(new Position(0, 0), bombBagCapacity, playerLives, playerInvisibilityTime, monsterVelocity, monsterInvisibilityTime);
-                        this.mapLevel = mapRepoStringRLE.load("_4B_9_x_T_9_4x____SBBS5_3x_T__SBBS_3S_3x_T__SH_S_3S___x_4S4_3S_3x_9__S_3x_5__9xMT_5T3_5x_TT_T__T__B_4x__T3BTTHB_S___x_5_HTTK_S_3x__B__BBS4T_3x_9_4T_x_9_5Tx");
+                        int worldNumber = integerProperty(config, "levels", 1);
+                        String[] worldString = new String[worldNumber];
+                        for(int i = 0; i < worldNumber; i++){
+                            worldString[i] = (worldProperty(config, "level"+(i+1), "x"));
+                        }
+                        if (compression == true){
+                            this.mapLevel = mapRepoStringRLE.load(worldString[1]);
+                        } else {
+                            this.mapLevel = mapRepoStringRLE.loadnoc(worldString[2]);
+                        }
+                        
+                        //this.mapLevel = mapRepoStringRLE.load("_4B_9_x_T_9_4x_VNnSBBS5_3x_T__SBBS_3S_3x_T__SH_S_3S___x_4S4_3S_3x_9__S_3x_5__9xMT_5T3_5x_TT_T__T__B_4x__T3BTTHB_S___x_5_HTTK_S_3x__B__BBS4T_3x_9_4T_x_9_5Tx");
                         Game game = GameLauncher.load(configuration, this.mapLevel);
                         GameEngine engine = new GameEngine(game, stage);
                         engine.start();
