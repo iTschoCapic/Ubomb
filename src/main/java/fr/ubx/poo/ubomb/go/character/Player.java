@@ -32,6 +32,7 @@ public class Player extends GameObject implements Movable, TakeVisitor {
     @Override
     public void take(Key key) {
         this.keys++;
+        key.remove();
     }
 
     public void doMove(Direction direction) {
@@ -97,9 +98,10 @@ public class Player extends GameObject implements Movable, TakeVisitor {
         Position nextPos = this.getDirection().nextPosition(getPosition());
         GameObject next = game.grid().get(nextPos);
         if (next instanceof Door) {
-            if (!((Door)next).isOpen()) {
+            if (!((Door)next).isOpen() && getKeys() > 0) {
                 keys--;
                 ((Door)next).open();
+                ((Door)next).setModified(true);
             }
         }
     }

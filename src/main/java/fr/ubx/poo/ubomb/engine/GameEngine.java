@@ -4,16 +4,19 @@
 
 package fr.ubx.poo.ubomb.engine;
 
+import fr.ubx.poo.ubomb.launcher.*;
 import fr.ubx.poo.ubomb.game.Direction;
 import fr.ubx.poo.ubomb.game.Game;
 import fr.ubx.poo.ubomb.game.Position;
 import fr.ubx.poo.ubomb.go.character.*;
+import fr.ubx.poo.ubomb.go.decor.*;
 import fr.ubx.poo.ubomb.view.ImageResource;
 import fr.ubx.poo.ubomb.view.Sprite;
 import fr.ubx.poo.ubomb.view.SpriteFactory;
 import fr.ubx.poo.ubomb.view.SpritePlayer;
 import fr.ubx.poo.ubomb.view.SpriteMonster;
 import fr.ubx.poo.ubomb.go.GameObject;
+import fr.ubx.poo.ubomb.launcher.GameLauncher;
 import javafx.animation.AnimationTimer;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -38,7 +41,7 @@ import java.util.Set;
 public final class GameEngine {
 
     private static AnimationTimer gameLoop;
-    private final Game game;
+    private Game game;
     private final Player player;
     private final Monster monster;
     private boolean isOnMonster;
@@ -48,6 +51,7 @@ public final class GameEngine {
     private StatusBar statusBar;
     private Pane layer;
     private Input input;
+    private int currentLevel = 0;
 
     public GameEngine(Game game, final Stage stage) {
         this.stage = stage;
@@ -80,6 +84,7 @@ public final class GameEngine {
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
 
+        sprites.clear();
         // Create sprites
         for (var decor : game.grid().values()) {
             sprites.add(SpriteFactory.create(layer, decor));
@@ -106,6 +111,7 @@ public final class GameEngine {
                 cleanupSprites();
                 render();
                 statusBar.update(game);
+                
             }
         };
     }
@@ -134,10 +140,17 @@ public final class GameEngine {
 
     private void checkCollision(long now) {
         List<GameObject> gameObjects = game.getGameObjects(player.getPosition());
-        if (gameObjects.contains(player) && gameObjects.contains(monster)) {
-            if (!isOnMonster) {
-                player.updateLives(-1);
-                isOnMonster = true;
+        if (gameObjects.contains(player)) {
+            if (gameObjects.contains(monster)){
+                if (!isOnMonster) {
+                    player.updateLives(-1);
+                    isOnMonster = true;
+                }
+            } else {
+                if (game.grid().get(player.getPosition()) instanceof Princess){
+                    gameLoop.stop();
+                    showMessage("Gagné!", Color.RED);
+                }
             }
         }
         else
@@ -184,10 +197,13 @@ public final class GameEngine {
 
     private void update(long now) {
         player.update(now);
-
         if (player.getLives() == 0) {
             gameLoop.stop();
             showMessage("Perdu!", Color.RED);
+        }
+        if (currentLevel != game.getCurrentLevel()){
+            currentLevel = game.getCurrentLevel();
+            initialize();
         }
     }
 
@@ -201,6 +217,15 @@ public final class GameEngine {
         cleanUpSprites.forEach(Sprite::remove);
         sprites.removeAll(cleanUpSprites);
         cleanUpSprites.clear();
+    }
+
+    public void updateSprites() {
+        sprites.forEach(sprite -> {
+            if (sprite.getGameObject().isModified()) {
+                sprite.updateImage();
+                System.out.println("True");
+            }
+        });
     }
 
     private void render() {

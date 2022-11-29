@@ -15,7 +15,7 @@ public class Door extends Decor {
     }
 
     public void open() {
-        isOpen = false;
+        isOpen = true;
     }
 
     public boolean isOpen() {
@@ -31,10 +31,21 @@ public class Door extends Decor {
         if (isOpen) {
             if (isSuperior) {
                 // Go to superior level
+                if (player.game.getMaxLevel() == player.game.getCurrentLevel()+1){
+                    return;
+                }
+                player.game.setCurrentLevel(1);
+                player.game.update(-1);
             }
             else {
                 // Go to inferior level
+                if (player.game.getCurrentLevel() == 0){
+                    return;
+                }
+                player.game.setCurrentLevel(-1);
+                player.game.update(1);
             }
+            
         }
     }
 

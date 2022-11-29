@@ -6,6 +6,8 @@ package fr.ubx.poo.ubomb.view;
 
 import fr.ubx.poo.ubomb.game.Position;
 import fr.ubx.poo.ubomb.go.GameObject;
+import fr.ubx.poo.ubomb.go.decor.*;
+import static fr.ubx.poo.ubomb.view.ImageResource.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -35,6 +37,23 @@ public class Sprite {
     }
 
     public void updateImage() {
+        if (this.gameObject instanceof Door){
+            if (((Door) this.gameObject).isModified()){
+                if (((Door) this.gameObject).isOpen()){
+                    if (((Door) this.gameObject).isSuperior()){
+                        this.image = DOOR_OPENED_PLUS.getImage();
+                    } else {
+                        this.image = DOOR_OPENED_MINUS.getImage();
+                    }
+                } else {
+                    if (((Door) this.gameObject).isSuperior()){
+                        this.image = DOOR_CLOSED_PLUS.getImage();
+                    } else {
+                        this.image = DOOR_CLOSED_MINUS.getImage();
+                    }
+                }
+            }
+        }
     }
 
     public Position getPosition() {

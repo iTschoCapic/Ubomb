@@ -20,7 +20,8 @@ import javafx.stage.Stage;
 import java.io.*;
 
 public class GameLauncherView extends BorderPane {
-    private MapLevel mapLevel = new MapLevel(0,0);
+    private MapLevel[] mapLevel = new MapLevel[10]; // Fix to have variable amount of MapLevel
+    private Configuration configuration;
     private final FileChooser fileChooser = new FileChooser();
 
     private int integerProperty(Properties config, String name, int defaultValue) {
@@ -35,9 +36,11 @@ public class GameLauncherView extends BorderPane {
         return Boolean.parseBoolean(config.getProperty(name, Boolean.toString(defaultValue)));
     }
 
-    /*private Position playerProperty(Properties config, String name, String defaultValue) {
-        return Position.parsePosition(config.getProperty(name, String.toString(defaultValue))); // 0x0
-    }*/
+    private Position playerProperty(Properties config, String name, String defaultValue) {
+        int n = defaultValue.length()/2;
+        String string = config.getProperty(name, defaultValue);
+        return new Position(Integer.parseInt(string.substring(0, n)), Integer.parseInt(string.substring(n+1)));
+    }
 
     private String worldProperty(Properties config, String name, String defaultValue) {
         return config.getProperty(name, defaultValue);
@@ -50,10 +53,11 @@ public class GameLauncherView extends BorderPane {
         Menu menuFile = new Menu("File");
         MenuItem loadItem = new MenuItem("Load from file ...");
         MenuItem defaultItem = new MenuItem("Load default configuration");
+        // To complete if we have time // Export as file MenuItem exportItem = new MenuItem("Export as file ...");
         MenuItem exitItem = new MenuItem("Exit");
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
         menuFile.getItems().addAll(
-                loadItem, defaultItem, new SeparatorMenuItem(),
+                loadItem, defaultItem, /* To complete if we have time // Export as file exportItem,*/ new SeparatorMenuItem(),
                 exitItem);
 
         menuBar.getMenus().addAll(menuFile);
@@ -76,30 +80,33 @@ public class GameLauncherView extends BorderPane {
                     Properties config = new Properties();
                     try {
                         config.load(in);
-                        //Position playerPosition = playerProperty(config, "player", "0x0");
+                        Position playerPosition = playerProperty(config, "player", "0x0");
                         boolean compression = booleanProperty(config, "compression", false);
                         int bombBagCapacity = integerProperty(config, "bombBagCapacity", 3);
                         int playerLives = integerProperty(config, "playerLives", 5);
                         long playerInvisibilityTime = longProperty(config, "playerInvisibilityTime", 4000);
                         int monsterVelocity = integerProperty(config, "monsterVelocity", 5);
                         long monsterInvisibilityTime = longProperty(config, "monsterInvisibilityTime", 1000);
-                        Configuration configuration = new Configuration(new Position(0, 0), bombBagCapacity, playerLives, playerInvisibilityTime, monsterVelocity, monsterInvisibilityTime);
+                        configuration = new Configuration(playerPosition, bombBagCapacity, playerLives, playerInvisibilityTime, monsterVelocity, monsterInvisibilityTime);
+                        
                         int worldNumber = integerProperty(config, "levels", 1);
                         String[] worldString = new String[worldNumber];
                         for(int i = 0; i < worldNumber; i++){
-                            worldString[i] = (worldProperty(config, "level"+(i+1), "x"));
-                        }
-                        if (compression == true){
-                            this.mapLevel = mapRepoStringRLE.load(worldString[1]);
-                        } else {
-                            this.mapLevel = mapRepoStringRLE.loadnoc(worldString[2]);
+                            worldString[i] = worldProperty(config, "level"+(i+1), "x");
+                            this.mapLevel[i] = new MapLevel(0, 0);
+                            if (compression == true){
+                                this.mapLevel[i] = mapRepoStringRLE.load(worldString[i]);
+                            } else {
+                                this.mapLevel[i] = mapRepoStringRLE.loadnoc(worldString[i]);
+                            }
                         }
                         
-                        //this.mapLevel = mapRepoStringRLE.load("_4B_9_x_T_9_4x_VNnSBBS5_3x_T__SBBS_3S_3x_T__SH_S_3S___x_4S4_3S_3x_9__S_3x_5__9xMT_5T3_5x_TT_T__T__B_4x__T3BTTHB_S___x_5_HTTK_S_3x__B__BBS4T_3x_9_4T_x_9_5Tx");
-                        Game game = GameLauncher.load(configuration, this.mapLevel);
+                        Game game = GameLauncher.load(configuration, this.mapLevel[0]);
+                        game.setWorldString(worldString);
+                        game.setMaxLevel(worldNumber);
+                        game.setCompression(compression);
                         GameEngine engine = new GameEngine(game, stage);
                         engine.start();
-                        //updateGrid(mapLevel);// Chargement depuis un fichier (avec compression)
                     } catch(IOException IOex){
                         return;
                     }
@@ -109,6 +116,22 @@ public class GameLauncherView extends BorderPane {
                 }
             }
         });
+
+        /* To complete if we have time // Export as file should be accessible from edit mode or a keyboard shortcut
+        exportItem.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(stage);
+            if (file != null) {
+                try {
+                    Writer out = new FileWriter(file);
+                    GameLauncher.export(out, configuration, this.mapLevel); // Sauvegarde dans un fichier
+                } catch(FileNotFoundException FNFEex) {
+                    return;
+                } catch(IOException IOex){
+                    return;
+                }
+            }
+        });*/
 
 
         defaultItem.setOnAction(e -> {

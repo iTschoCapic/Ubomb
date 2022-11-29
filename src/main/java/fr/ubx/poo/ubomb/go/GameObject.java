@@ -23,7 +23,7 @@ public abstract class GameObject implements Walkable {
     }
 
     public Position getPosition() {
-        return position;
+        return this.position;
     }
 
     public void setPosition(Position position) {

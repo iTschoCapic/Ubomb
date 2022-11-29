@@ -8,7 +8,7 @@ import fr.ubx.poo.ubomb.launcher.MapLevel;
 import static fr.ubx.poo.ubomb.launcher.Entity.*;
 
 public class MapRepoStringRLE implements MapRepo {
-    final char EOL = 'x';
+    private final char EOL = 'x';
     
     private String compression(MapLevel mapLevel){
         StringBuilder s = new StringBuilder();
@@ -95,7 +95,7 @@ public class MapRepoStringRLE implements MapRepo {
         return s;
     }
 
-    public MapLevel load(Reader in) throws IOException{
+    /*public MapLevel load(Reader in) throws IOException{
         StringBuilder s = new StringBuilder();
         int r;
         while ((r = in.read()) != -1){
@@ -108,7 +108,7 @@ public class MapRepoStringRLE implements MapRepo {
         ou.write(export(mapLevel));
         ou.flush();
         return;
-    }
+    }*/
 
     @Override
     public MapLevel loadnoc(String string) {
