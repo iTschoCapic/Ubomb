@@ -36,13 +36,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 public final class GameEngine {
 
     private static AnimationTimer gameLoop;
     private Game game;
     private final Player player;
-    private final Monster monster;
+    private final ArrayList<Monster> monsters;
     private boolean isOnMonster;
     private final List<Sprite> sprites = new LinkedList<>();
     private final Set<Sprite> cleanUpSprites = new HashSet<>();
@@ -56,7 +57,7 @@ public final class GameEngine {
         this.stage = stage;
         this.game = game;
         this.player = game.player();
-        this.monster = game.monster();
+        this.monsters = game.getMonsters();
         this.isOnMonster = false;
         initialize();
         buildAndSetGameLoop();
@@ -91,7 +92,8 @@ public final class GameEngine {
         }
 
         sprites.add(new SpritePlayer(layer, player));
-        sprites.add(new SpriteMonster(layer, monster));
+        for (Monster monster : monsters)
+            sprites.add(new SpriteMonster(layer, monster));
     }
 
     void buildAndSetGameLoop() {
@@ -139,7 +141,14 @@ public final class GameEngine {
 
     private void checkCollision(long now) {
         List<GameObject> gameObjects = game.getGameObjects(player.getPosition());
-        if (gameObjects.contains(monster)) {
+        boolean thereIsAMOnster = false;
+        for (Monster monster : monsters) {
+            if (gameObjects.contains(monster)) {
+                thereIsAMOnster = true;
+                break;
+            }
+        }
+        if (thereIsAMOnster) {
             if (!isOnMonster) {
                 player.updateLives(-1);
                 isOnMonster = true;

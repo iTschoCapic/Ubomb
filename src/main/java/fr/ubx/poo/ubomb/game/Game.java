@@ -10,12 +10,13 @@ import fr.ubx.poo.ubomb.game.Position;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.*;
 
 public class Game {
 
     private final Configuration configuration;
     private final Player player;
-    private final Monster monster;
+    private final ArrayList<Monster> monsters;
     private Grid grid;
     private int currentLevel;
     private int maxLevel;
@@ -29,7 +30,7 @@ public class Game {
         this.configuration = configuration;
         this.grid = grid;
         this.player = new Player(this, configuration.playerPosition());
-        this.monster = new Monster(new Position(0, 0));
+        this.monsters = grid.getMonsters();
         this.currentLevel = 0;
     }
 
@@ -42,10 +43,10 @@ public class Game {
         List<GameObject> gos = new LinkedList<>();
         if (player().getPosition().equals(position))
             gos.add(player);
-        //for (Monster monster in monsters()) {
-        if (monster().getPosition().equals(position))
-            gos.add(monster);
-        //}
+        for (Monster monster : getMonsters()) {
+            if (monster.getPosition().equals(position))
+                gos.add(monster);
+            }
         return gos;
     }
 
@@ -75,8 +76,8 @@ public class Game {
         return this.player;
     }
 
-    public Monster monster() {
-        return this.monster;
+    public ArrayList<Monster> getMonsters() {
+        return this.monsters;
     }
 
     public void setCurrentLevel(int delta){

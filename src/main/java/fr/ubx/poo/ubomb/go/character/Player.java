@@ -19,20 +19,18 @@ public class Player extends GameObject implements Movable, TakeVisitor {
     private Direction direction;
     private boolean moveRequested = false;
     private int lives;
-    private int availableBombs;
     private int keys;
+    private int availableBombs;
+    private int bombBagCapacity;
+    private int bombRange;
 
     public Player(Game game, Position position) {
         super(game, position);
         this.direction = Direction.DOWN;
         this.lives = game.configuration().playerLives();
-    }
-
-
-    @Override
-    public void take(Key key) {
-        this.keys++;
-        key.remove();
+        this.bombBagCapacity = game.configuration().bombBagCapacity();
+        this.bombRange = 1;
+        this.availableBombs = bombBagCapacity;
     }
 
     public void doMove(Direction direction) {
@@ -51,6 +49,14 @@ public class Player extends GameObject implements Movable, TakeVisitor {
 
     public int getAvailableBombs() {
         return availableBombs;
+    }
+
+    public int getBombBagCapacity() {
+        return bombBagCapacity;
+    }
+
+    public int getBombRange() {
+        return bombRange;
     }
 
     public int getKeys() {
@@ -110,4 +116,43 @@ public class Player extends GameObject implements Movable, TakeVisitor {
     public void explode() {
         // TODO
     }
+
+    //takes implementations
+
+    @Override
+    public void take(Key key) {
+        this.keys++;
+    }
+
+    @Override
+    public void take(Heart heart) {
+        this.updateLives(1);
+    }
+
+    @Override
+    public void take(BombCapacity bombCapacity) {
+        if (bombCapacity.positive()) {
+            this.bombBagCapacity++;
+        }
+        else {
+            if (this.bombBagCapacity > 1) {
+                this.bombBagCapacity--;
+                if (this.availableBombs > this.bombBagCapacity)
+                    this.availableBombs = this.bombBagCapacity;
+            }
+        }
+    }
+
+    @Override
+    public void take(BombRange bombRange) {
+        if (bombRange.positive()) {
+            this.bombRange++;
+        }
+        else {
+            if (this.bombRange > 1) {
+                this.bombRange--;
+            }
+        }
+    }
+
 }
