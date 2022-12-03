@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-
 public final class GameEngine {
 
     private static AnimationTimer gameLoop;
@@ -111,7 +110,7 @@ public final class GameEngine {
                 cleanupSprites();
                 render();
                 statusBar.update(game);
-                
+
             }
         };
     }
@@ -140,21 +139,18 @@ public final class GameEngine {
 
     private void checkCollision(long now) {
         List<GameObject> gameObjects = game.getGameObjects(player.getPosition());
-        if (gameObjects.contains(player)) {
-            if (gameObjects.contains(monster)){
-                if (!isOnMonster) {
-                    player.updateLives(-1);
-                    isOnMonster = true;
-                }
-            } else {
-                if (game.grid().get(player.getPosition()) instanceof Princess){
-                    gameLoop.stop();
-                    showMessage("Gagné!", Color.RED);
-                }
+        if (gameObjects.contains(monster)) {
+            if (!isOnMonster) {
+                player.updateLives(-1);
+                isOnMonster = true;
+            }
+        } else {
+            isOnMonster = false;
+            if (game.grid().get(player.getPosition()) instanceof Princess) {
+                gameLoop.stop();
+                showMessage("Gagné!", Color.RED);
             }
         }
-        else
-            isOnMonster = false;
     }
 
     private void processInput(long now) {
@@ -194,14 +190,13 @@ public final class GameEngine {
         }.start();
     }
 
-
     private void update(long now) {
         player.update(now);
         if (player.getLives() == 0) {
             gameLoop.stop();
             showMessage("Perdu!", Color.RED);
         }
-        if (currentLevel != game.getCurrentLevel()){
+        if (currentLevel != game.getCurrentLevel()) {
             currentLevel = game.getCurrentLevel();
             initialize();
         }
