@@ -64,6 +64,7 @@ public final class GameEngine {
     }
 
     private void initialize() {
+
         Group root = new Group();
         layer = new Pane();
 
@@ -159,6 +160,13 @@ public final class GameEngine {
                 gameLoop.stop();
                 showMessage("Gagné!", Color.RED);
             }
+        }
+        Decor gameDecor = game.grid().get(player.getPosition());
+        Position nextPos = player.getDirection().nextPosition(player.getPosition());
+        if (gameDecor instanceof Box) {
+            ((Box)gameDecor).doMove(player.getDirection());
+            game.grid().remove(player.getPosition());
+            game.grid().set(nextPos, gameDecor);
         }
     }
 
