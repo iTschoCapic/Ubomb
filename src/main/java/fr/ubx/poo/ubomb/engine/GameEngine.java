@@ -43,7 +43,7 @@ public final class GameEngine {
     private static AnimationTimer gameLoop;
     private Game game;
     private final Player player;
-    private final ArrayList<Monster> monsters;
+    private ArrayList<Monster> monsters;
     private boolean isOnMonster;
     private final List<Sprite> sprites = new LinkedList<>();
     private final Set<Sprite> cleanUpSprites = new HashSet<>();
@@ -85,6 +85,8 @@ public final class GameEngine {
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
 
+        this.monsters = game.getMonsters();
+
         sprites.clear();
         // Create sprites
         for (var decor : game.grid().values()) {
@@ -93,8 +95,14 @@ public final class GameEngine {
         }
 
         sprites.add(new SpritePlayer(layer, player));
-        for (Monster monster : monsters)
+        for (Monster monster : monsters){
+            monster.setGame(this.game);
             sprites.add(new SpriteMonster(layer, monster));
+            if (monster.game.getCurrentLevel() == currentLevel){
+                monster.setRequestMove(true);
+            }
+        }
+        
     }
 
     void buildAndSetGameLoop() {
@@ -144,21 +152,19 @@ public final class GameEngine {
         List<GameObject> gameObjects = game.getGameObjects(player.getPosition());
         boolean thereIsAMOnster = false;
         for (Monster monster : monsters) {
-            if (gameObjects.contains(monster)) {
-                thereIsAMOnster = true;
-                break;
-            }
-        }
-        if (thereIsAMOnster) {
-            if (!isOnMonster) {
-                player.updateLives(-1);
-                isOnMonster = true;
-            }
-        } else {
-            isOnMonster = false;
-            if (game.grid().get(player.getPosition()) instanceof Princess) {
-                gameLoop.stop();
-                showMessage("Gagné!", Color.RED);
+            if (monster.game.getCurrentLevel() == currentLevel){
+                if (monster.getPosition().equals(player.getPosition())){
+                    if (!isOnMonster){
+                        player.updateLives(-1, now);
+                        isOnMonster = true;
+                    }
+                } else {
+                    isOnMonster = false;
+                    if (game.grid().get(player.getPosition()) instanceof Princess) {
+                        gameLoop.stop();
+                        showMessage("Gagné!", Color.RED);
+                    }
+                }
             }
         }
         Decor gameDecor = game.grid().get(player.getPosition());
@@ -208,13 +214,34 @@ public final class GameEngine {
     }
 
     private void update(long now) {
+        for (Monster monster : monsters){
+            if (monster.getRequestMove() == true){
+                monster.update(now);
+            }
+        }
         player.update(now);
         if (player.getLives() == 0) {
             gameLoop.stop();
             showMessage("Perdu!", Color.RED);
         }
         if (currentLevel != game.getCurrentLevel()) {
+            if (currentLevel - game.getCurrentLevel() > 0){
+                game.setMonsterVelocity(game.getMonsterVelocity(), -1, currentLevel);
+            } else {
+                game.setMonsterVelocity(game.getMonsterVelocity(), 1, currentLevel);
+            }
             currentLevel = game.getCurrentLevel();
+            for (Monster monster : monsters){
+                if (currentLevel % 2 == 0){
+                    if (monster.game.getCurrentLevel() == currentLevel){
+                        System.out.println((currentLevel/2)+1);
+                        monster.setLives((currentLevel/2)+1);
+                    }
+                } else {
+                    System.out.println(((currentLevel-1)/2)+1);
+                    monster.setLives(((currentLevel-1)/2)+1);
+                }
+            }
             initialize();
         }
     }
@@ -235,7 +262,6 @@ public final class GameEngine {
         sprites.forEach(sprite -> {
             if (sprite.getGameObject().isModified()) {
                 sprite.updateImage();
-                System.out.println("True");
             }
         });
     }

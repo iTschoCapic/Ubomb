@@ -5,7 +5,7 @@
 package fr.ubx.poo.ubomb.go.decor.bonus;
 
 import fr.ubx.poo.ubomb.game.Position;
-import fr.ubx.poo.ubomb.go.character.Player;
+import fr.ubx.poo.ubomb.go.character.*;
 import fr.ubx.poo.ubomb.go.decor.Decor;
 
 public abstract class Bonus extends Decor {
@@ -15,6 +15,11 @@ public abstract class Bonus extends Decor {
 
     @Override
     public boolean walkableBy(Player player) {
+        return true;
+    }
+
+    @Override
+    public boolean walkableBy(Monster monster) {
         return true;
     }
 

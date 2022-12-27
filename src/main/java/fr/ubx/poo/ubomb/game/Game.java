@@ -16,7 +16,7 @@ public class Game {
 
     private final Configuration configuration;
     private final Player player;
-    private final ArrayList<Monster> monsters;
+    private ArrayList<Monster> monsters;
     private Grid grid;
     private int currentLevel;
     private int maxLevel;
@@ -25,6 +25,7 @@ public class Game {
     private Grid[] loadedGrid = new Grid[10];
     private boolean compression;
     private Position[][] doors;
+    private long monsterVelocity;
 
     public Game(Configuration configuration, Grid grid) {
         this.configuration = configuration;
@@ -32,6 +33,7 @@ public class Game {
         this.player = new Player(this, configuration.playerPosition());
         this.monsters = grid.getMonsters();
         this.currentLevel = 0;
+        this.monsterVelocity = configuration.monsterVelocity();
     }
 
     public Configuration configuration() {
@@ -45,6 +47,7 @@ public class Game {
             gos.add(player);
         for (Monster monster : getMonsters()) {
             if (monster.getPosition().equals(position))
+                monster.setMonsterVelocity(configuration.monsterVelocity());
                 gos.add(monster);
             }
         return gos;
@@ -76,7 +79,12 @@ public class Game {
         return this.player;
     }
 
+    public void updateMonsters(){
+        this.monsters = grid.getMonsters();
+    }
+
     public ArrayList<Monster> getMonsters() {
+        updateMonsters();
         return this.monsters;
     }
 
@@ -118,6 +126,19 @@ public class Game {
 
     public Position getDoor(int level, int delta){
         return this.doors[level][delta];
+    }
+
+    public void setMonsterVelocity(long velocity, int delta, int level){
+        for (Monster monster : getMonsters()){
+            if (getCurrentLevel() == level+delta){
+                monster.setMonsterVelocity(velocity+(delta*10));
+                this.monsterVelocity = velocity+(delta*10);
+            }
+        }
+    }
+
+    public long getMonsterVelocity(){
+        return this.monsterVelocity;
     }
 
 }
