@@ -16,7 +16,7 @@ public class Monster extends Character {
     private Direction direction;
     private int lives = 1;
     private long lastMove = 0;
-    private long velocity = (long)1e10; // Can't move while the real velocity hasn't been loaded
+    private long velocity = (long)1e9; // Can't move while the real velocity hasn't been loaded
     public Game game = null;
     private boolean requestMove = false;
 
@@ -58,7 +58,6 @@ public class Monster extends Character {
                 }
             }
         }
-        
     }
 
     public void setMonsterVelocity(long velocity){

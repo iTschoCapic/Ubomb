@@ -19,9 +19,8 @@ public class Player extends Character implements Movable, TakeVisitor {
     private Direction direction;
     private boolean moveRequested = false;
     private int lives;
-    private long invinsibilityTime;
-    private boolean isInvinsible = false;
-    private long lastHit = 0;
+    private long invincibilityTime = 4000;
+    private boolean isInvincible = false;
     private int keys;
     private int availableBombs;
     private int bombBagCapacity;
@@ -31,7 +30,7 @@ public class Player extends Character implements Movable, TakeVisitor {
         super(game, position);
         this.direction = Direction.DOWN;
         this.lives = game.configuration().playerLives();
-        this.invinsibilityTime = game.configuration().playerInvinsibilityTime();
+        this.invincibilityTime = game.configuration().playerInvincibilityTime();
         this.bombBagCapacity = game.configuration().bombBagCapacity();
         this.bombRange = 1;
         this.availableBombs = bombBagCapacity;
@@ -67,18 +66,8 @@ public class Player extends Character implements Movable, TakeVisitor {
         return keys;
     }
 
-    public void updateLives(int delta, long now) {
-        if (now == -1 && delta > 0){
-            this.lives += delta;
-        }
-        if (!isInvinsible){
-            this.lives += delta;
-            isInvinsible = true;
-        } else {
-            if ((now - lastHit) > invinsibilityTime){
-                isInvinsible = false;
-            }
-        }
+    public void updateLives(int delta) {
+        this.lives += delta;
     }
 
     public Direction getDirection() {
@@ -140,7 +129,7 @@ public class Player extends Character implements Movable, TakeVisitor {
 
     @Override
     public void take(Heart heart) {
-        updateLives(1, -1);
+        updateLives(1);
     }
 
     @Override

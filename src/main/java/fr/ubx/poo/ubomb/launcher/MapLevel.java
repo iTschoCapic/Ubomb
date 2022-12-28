@@ -11,7 +11,7 @@ public class MapLevel {
     public MapLevel(int width, int height) {
         this.width = width;
         this.height = height;
-        this.grid = new Entity[height][width];
+        this.grid = new Entity[width][height];
     }
 
     public int width() {
@@ -22,11 +22,11 @@ public class MapLevel {
     }
 
     public Entity get(int i, int j) {
-        return grid[j][i];
+        return grid[i][j];
     }
 
     public void set(int i, int j, Entity entity) {
-        grid[j][i] = entity;
+        grid[i][j] = entity;
     }
 
 }

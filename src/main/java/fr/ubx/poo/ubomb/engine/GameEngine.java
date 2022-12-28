@@ -52,6 +52,8 @@ public final class GameEngine {
     private Pane layer;
     private Input input;
     private int currentLevel = 0;
+    private boolean thereIsAMOnster = false;
+    private Timer playerTimer = new Timer(4000);
 
     public GameEngine(Game game, final Stage stage) {
         this.stage = stage;
@@ -59,6 +61,7 @@ public final class GameEngine {
         this.player = game.player();
         this.monsters = game.getMonsters();
         this.isOnMonster = false;
+        this.playerTimer = new Timer(game.configuration().playerInvincibilityTime());
         initialize();
         buildAndSetGameLoop();
     }
@@ -150,13 +153,13 @@ public final class GameEngine {
 
     private void checkCollision(long now) {
         List<GameObject> gameObjects = game.getGameObjects(player.getPosition());
-        boolean thereIsAMOnster = false;
         for (Monster monster : monsters) {
             if (monster.game.getCurrentLevel() == currentLevel){
                 if (monster.getPosition().equals(player.getPosition())){
-                    if (!isOnMonster){
-                        player.updateLives(-1, now);
+                    if (!isOnMonster && !playerTimer.isRunning()){
                         isOnMonster = true;
+                        player.updateLives(-1);
+                        playerTimer.start();
                     }
                 } else {
                     isOnMonster = false;
@@ -214,6 +217,7 @@ public final class GameEngine {
     }
 
     private void update(long now) {
+        playerTimer.update(now);
         for (Monster monster : monsters){
             if (monster.getRequestMove() == true){
                 monster.update(now);
@@ -234,11 +238,9 @@ public final class GameEngine {
             for (Monster monster : monsters){
                 if (currentLevel % 2 == 0){
                     if (monster.game.getCurrentLevel() == currentLevel){
-                        System.out.println((currentLevel/2)+1);
                         monster.setLives((currentLevel/2)+1);
                     }
                 } else {
-                    System.out.println(((currentLevel-1)/2)+1);
                     monster.setLives(((currentLevel-1)/2)+1);
                 }
             }

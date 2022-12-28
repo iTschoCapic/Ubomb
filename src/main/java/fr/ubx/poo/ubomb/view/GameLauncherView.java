@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 import java.io.*;
 
 public class GameLauncherView extends BorderPane {
-    private MapLevel[] mapLevel = new MapLevel[10]; // Fix to have variable amount of MapLevel
+    private MapLevel[] mapLevel = new MapLevel[100]; // Fix to have variable amount of MapLevel
     private Configuration configuration;
     private final FileChooser fileChooser = new FileChooser();
 

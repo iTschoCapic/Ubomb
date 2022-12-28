@@ -75,14 +75,14 @@ public class MapRepoStringRLE implements MapRepo {
         if (width == 0){
             MapException Exception = new MapException("Missing eol character");
         }
-        MapLevel mapLevel = new MapLevel(width, height);
+        MapLevel mapLevel = new MapLevel(height, width);
 
-        for(int i = 0; i < width; i++){
-            for(int j = 0; j < height; j++){
-                if (Entity.fromCode(string.charAt(j+i+(i*width))) == null){
+        for(int i = 0; i < width; i++){ // Nb_Line
+            for(int j = 0; j < height; j++){ // Nb_char
+                if (Entity.fromCode(string.charAt(j+i+(i*height))) == null){
                     MapException Exception = new MapException("Invalid character");
                 }
-                mapLevel.set(i, j, Entity.fromCode(string.charAt(j+i+(i*width))));
+                mapLevel.set(j, i, Entity.fromCode(string.charAt(j+i+(i*height))));
             }
         }
         return mapLevel;
@@ -94,21 +94,6 @@ public class MapRepoStringRLE implements MapRepo {
         s = compression(mapLevel);
         return s;
     }
-
-    /*public MapLevel load(Reader in) throws IOException{
-        StringBuilder s = new StringBuilder();
-        int r;
-        while ((r = in.read()) != -1){
-            s.append((char) r);
-        }
-        return load(s.toString());
-    }
-
-    public void export(MapLevel mapLevel, Writer ou) throws IOException{
-        ou.write(export(mapLevel));
-        ou.flush();
-        return;
-    }*/
 
     @Override
     public MapLevel loadnoc(String string) {
@@ -125,14 +110,14 @@ public class MapRepoStringRLE implements MapRepo {
         if (width == 0){
             MapException Exception = new MapException("Missing eol character");
         }
-        MapLevel mapLevel = new MapLevel(width, height);
+        MapLevel mapLevel = new MapLevel(height, width);
 
-        for(int i = 0; i < width; i++){
-            for(int j = 0; j < height; j++){
-                if (Entity.fromCode(string.charAt(j+i+(i*width))) == null){
+        for(int i = 0; i < width; i++){ // Nb_Line
+            for(int j = 0; j < height; j++){ // Nb_char
+                if (Entity.fromCode(string.charAt(j+i+(i*height))) == null){
                     MapException Exception = new MapException("Invalid character");
                 }
-                mapLevel.set(i, j, Entity.fromCode(string.charAt(j+i+(i*width))));
+                mapLevel.set(j, i, Entity.fromCode(string.charAt(j+i+(i*height))));
             }
         }
         return mapLevel;

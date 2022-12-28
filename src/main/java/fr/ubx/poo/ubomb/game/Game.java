@@ -22,7 +22,7 @@ public class Game {
     private int maxLevel;
     private String[] worldString;
     private final MapRepoStringRLE mapRepoStringRLE = new MapRepoStringRLE();
-    private Grid[] loadedGrid = new Grid[10];
+    private Grid[] loadedGrid = new Grid[100];
     private boolean compression;
     private Position[][] doors;
     private long monsterVelocity;
@@ -58,7 +58,9 @@ public class Game {
     }
 
     public void update(int delta){
-        this.loadedGrid[(getCurrentLevel()+delta)] = new Level(new MapLevel(0, 0));
+        if (this.loadedGrid[(getCurrentLevel()+delta)] == null){
+            this.loadedGrid[(getCurrentLevel()+delta)] = new Level(new MapLevel(0, 0));
+        }
         this.loadedGrid[(getCurrentLevel()+delta)] = this.grid;
 
         if (this.loadedGrid[getCurrentLevel()] == null){
@@ -131,8 +133,8 @@ public class Game {
     public void setMonsterVelocity(long velocity, int delta, int level){
         for (Monster monster : getMonsters()){
             if (getCurrentLevel() == level+delta){
-                monster.setMonsterVelocity(velocity+(delta*10));
-                this.monsterVelocity = velocity+(delta*10);
+                monster.setMonsterVelocity(velocity+(delta));
+                this.monsterVelocity = velocity+(delta);
             }
         }
     }
