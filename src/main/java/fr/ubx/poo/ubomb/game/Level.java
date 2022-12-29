@@ -20,6 +20,8 @@ public class Level implements Grid {
 
     private final Map<Position, Decor> elements = new HashMap<>();
 
+    private boolean princess = false;
+
     public Level(MapLevel entities) {
         this.entities = entities;
         this.width = entities.width();
@@ -47,6 +49,7 @@ public class Level implements Grid {
                         break;
                     case Princess:
                         elements.put(position, new Princess(position));
+                        princess = true;
                         break;
                     case DoorPrevOpened:
                         elements.put(position, new Door(position, true, false));
@@ -95,6 +98,10 @@ public class Level implements Grid {
 
     public ArrayList<Monster> getMonsters() {
         return monsters;
+    }
+
+    public boolean getPrincess() {
+        return princess;
     }
 
     @Override

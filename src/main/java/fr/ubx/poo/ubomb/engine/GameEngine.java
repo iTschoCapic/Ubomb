@@ -105,6 +105,14 @@ public final class GameEngine {
                 monster.setRequestMove(true);
             }
         }
+
+        if (game.princessInLevel()){
+            for (Monster monster : monsters)
+                monster.setRandom(false);
+        } else {
+            for (Monster monster : monsters)
+                monster.setRandom(true);
+        }
         
     }
 

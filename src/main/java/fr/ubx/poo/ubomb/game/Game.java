@@ -26,12 +26,14 @@ public class Game {
     private boolean compression;
     private Position[][] doors;
     private long monsterVelocity;
+    private boolean princess = false;
 
     public Game(Configuration configuration, Grid grid) {
         this.configuration = configuration;
         this.grid = grid;
         this.player = new Player(this, configuration.playerPosition());
         this.monsters = grid.getMonsters();
+        this.princess = grid.getPrincess();
         this.currentLevel = 0;
         this.monsterVelocity = configuration.monsterVelocity();
     }
@@ -83,6 +85,11 @@ public class Game {
 
     public void updateMonsters(){
         this.monsters = grid.getMonsters();
+    }
+
+    public boolean princessInLevel(){
+        this.princess = grid.getPrincess();
+        return this.princess;
     }
 
     public ArrayList<Monster> getMonsters() {

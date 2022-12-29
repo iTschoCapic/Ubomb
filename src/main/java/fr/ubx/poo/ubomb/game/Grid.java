@@ -14,10 +14,11 @@ public interface Grid {
 
     ArrayList<Monster> getMonsters();
 
+    boolean getPrincess();
+
     void remove(Position position);
 
     Collection<Decor> values();
-
 
     boolean inside(Position nextPos);
 
