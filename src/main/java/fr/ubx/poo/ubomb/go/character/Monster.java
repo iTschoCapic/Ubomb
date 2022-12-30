@@ -62,6 +62,7 @@ public class Monster extends Character {
                 lastMove = now;
                 if (isRandom){
                     this.direction = this.direction.random();
+                    setModified(true);
                 } else {
                     if (this.game != null){
                         this.astar = new AStar(game, this);

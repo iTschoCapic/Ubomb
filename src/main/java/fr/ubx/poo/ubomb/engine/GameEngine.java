@@ -52,8 +52,8 @@ public final class GameEngine {
     private Pane layer;
     private Input input;
     private int currentLevel = 0;
-    private boolean thereIsAMOnster = false;
     private Timer playerTimer = new Timer(4000);
+    private int princessLevel;
 
     public GameEngine(Game game, final Stage stage) {
         this.stage = stage;
@@ -107,6 +107,7 @@ public final class GameEngine {
         }
 
         if (game.princessInLevel()){
+            game.setPrincessLevel(game.getCurrentLevel());
             for (Monster monster : monsters)
                 monster.setRandom(false);
         } else {
@@ -237,11 +238,20 @@ public final class GameEngine {
             showMessage("Perdu!", Color.RED);
         }
         if (currentLevel != game.getCurrentLevel()) {
-            if (currentLevel - game.getCurrentLevel() > 0){
-                game.setMonsterVelocity(game.getMonsterVelocity(), -1, currentLevel);
+            if (game.getPrincessLevel() > game.getCurrentLevel() || game.getPrincessLevel() == -1){
+                if (currentLevel - game.getCurrentLevel() > 0){
+                    game.setMonsterVelocity(game.getMonsterVelocity(), -1, currentLevel);
+                } else {
+                    game.setMonsterVelocity(game.getMonsterVelocity(), 1, currentLevel);
+                }
             } else {
-                game.setMonsterVelocity(game.getMonsterVelocity(), 1, currentLevel);
+                if (currentLevel - game.getCurrentLevel() > 0){
+                    game.setMonsterVelocity(game.getMonsterVelocity(), 1, currentLevel);
+                } else {
+                    game.setMonsterVelocity(game.getMonsterVelocity(), -1, currentLevel);
+                }
             }
+            
             currentLevel = game.getCurrentLevel();
             for (Monster monster : monsters){
                 if (currentLevel % 2 == 0){

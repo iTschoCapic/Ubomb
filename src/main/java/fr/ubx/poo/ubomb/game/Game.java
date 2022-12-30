@@ -24,9 +24,9 @@ public class Game {
     private final MapRepoStringRLE mapRepoStringRLE = new MapRepoStringRLE();
     private Grid[] loadedGrid = new Grid[100];
     private boolean compression;
-    private Position[][] doors;
     private long monsterVelocity;
     private boolean princess = false;
+    private int princessLevel = -1;
 
     public Game(Configuration configuration, Grid grid) {
         this.configuration = configuration;
@@ -67,7 +67,7 @@ public class Game {
 
         if (this.loadedGrid[getCurrentLevel()] == null){
             if (getCompression() == true){
-                this.loadedGrid[getCurrentLevel()] = new Level(mapRepoStringRLE.load(getWorldString(getCurrentLevel())));
+                this.loadedGrid[getCurrentLevel()] = new Level(mapRepoStringRLE.load(getWorldString(getCurrentLevel())));                    
             } else {
                 this.loadedGrid[getCurrentLevel()] = new Level(mapRepoStringRLE.loadnoc(getWorldString(getCurrentLevel())));
             }
@@ -90,6 +90,14 @@ public class Game {
     public boolean princessInLevel(){
         this.princess = grid.getPrincess();
         return this.princess;
+    }
+
+    public int getPrincessLevel() {
+        return this.princessLevel;
+    }
+    
+    public void setPrincessLevel(int level) {
+        this.princessLevel = level;
     }
 
     public ArrayList<Monster> getMonsters() {
@@ -129,17 +137,12 @@ public class Game {
         return this.compression;
     }
 
-    public void setDoors(int level, int delta, Position position){
-        this.doors[level][delta] = position;
-    }
-
-    public Position getDoor(int level, int delta){
-        return this.doors[level][delta];
-    }
-
     public void setMonsterVelocity(long velocity, int delta, int level){
         for (Monster monster : getMonsters()){
             if (getCurrentLevel() == level+delta){
+                monster.setMonsterVelocity(velocity+(delta));
+                this.monsterVelocity = velocity+(delta);
+            } else if (getPrincessLevel() <= getCurrentLevel()){
                 monster.setMonsterVelocity(velocity+(delta));
                 this.monsterVelocity = velocity+(delta);
             }

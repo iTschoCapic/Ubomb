@@ -45,7 +45,6 @@ public class Door extends Decor {
                 player.game.setCurrentLevel(-1);
                 player.game.update(1);
             }
-            
         }
     }
 
