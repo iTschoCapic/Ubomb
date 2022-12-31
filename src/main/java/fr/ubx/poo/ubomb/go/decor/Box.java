@@ -6,6 +6,7 @@ import fr.ubx.poo.ubomb.game.Position;
 import fr.ubx.poo.ubomb.go.GameObject;
 import fr.ubx.poo.ubomb.go.Movable;
 import fr.ubx.poo.ubomb.go.character.Player;
+import fr.ubx.poo.ubomb.go.character.Monster;
 import fr.ubx.poo.ubomb.go.decor.bonus.*;
 
 public class Box extends Decor implements Movable {
@@ -20,7 +21,14 @@ public class Box extends Decor implements Movable {
         Decor next = game.grid().get(nextPos);
         if (game.grid().inside(nextPos)) {
             if (next != null) {
+                
                 return next.walkableBy(this);
+            } else {
+                for (Monster monster : game.getMonsters()){
+                    if (monster.getPosition().equals(nextPos)){
+                        return monster.walkableBy(this);
+                    }
+                }
             }
             return true;
         }

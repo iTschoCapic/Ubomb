@@ -20,7 +20,7 @@ public class Monster extends Character {
     private Direction direction;
     private int lives = 1;
     private long lastMove = 0;
-    private long velocity = (long)1e9; // Can't move while the real velocity hasn't been loaded
+    private long velocity = (long)1e9;
     public Game game = null;
     private boolean requestMove = false;
     private boolean isRandom = true;
@@ -38,12 +38,23 @@ public class Monster extends Character {
         return direction;
     }
 
+    @Override
+    public boolean walkableBy(Monster monster) {
+        return false;
+    }
+
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         Decor next = game.grid().get(nextPos);
         if (game.grid().inside(nextPos)) {
             if (next != null) {
                 return next.walkableBy(this);
+            } else {
+                for (Monster monster : game.getMonsters()){
+                    if (monster.getPosition().equals(nextPos)){
+                        return monster.walkableBy(this);
+                    }
+                }
             }
             return true;
         }
@@ -71,19 +82,21 @@ public class Monster extends Character {
                         if (this.start.getPosition() != this.end.getPosition()){
                             this.path = this.astar.findPath(this.start, this.end);
                             if (this.path == null){
-                                return;
-                            }
-                            if (path.size() > 1){
-                                if (path.get(1).getX() > this.getPosition().getX()){
-                                    this.direction = Direction.RIGHT;
-                                } else if (path.get(1).getX() < this.getPosition().getX()){
-                                    this.direction = Direction.LEFT;
-                                } else if (path.get(1).getY() > this.getPosition().getY()){
-                                    this.direction = Direction.DOWN;
-                                } else if (path.get(1).getY() < this.getPosition().getY()){
-                                    this.direction = Direction.UP;
-                                }
+                                this.direction = this.direction.random();
                                 setModified(true);
+                            } else {
+                                if (path.size() > 1){
+                                    if (path.get(1).getX() > this.getPosition().getX()){
+                                        this.direction = Direction.RIGHT;
+                                    } else if (path.get(1).getX() < this.getPosition().getX()){
+                                        this.direction = Direction.LEFT;
+                                    } else if (path.get(1).getY() > this.getPosition().getY()){
+                                        this.direction = Direction.DOWN;
+                                    } else if (path.get(1).getY() < this.getPosition().getY()){
+                                        this.direction = Direction.UP;
+                                    }
+                                    setModified(true);
+                                }
                             }
                         }
                     }

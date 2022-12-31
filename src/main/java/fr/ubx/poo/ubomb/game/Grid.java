@@ -16,6 +16,10 @@ public interface Grid {
 
     boolean getPrincess();
 
+    Position getDoor(boolean isSuperior);
+
+    void setDoor(Position position, boolean isSuperior);
+
     void remove(Position position);
 
     Collection<Decor> values();

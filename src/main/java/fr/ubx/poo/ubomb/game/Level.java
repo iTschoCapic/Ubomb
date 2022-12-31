@@ -22,6 +22,9 @@ public class Level implements Grid {
 
     private boolean princess = false;
 
+    private Position nextSuperiorDoor;
+    private Position nextInferiorDoor;
+
     public Level(MapLevel entities) {
         this.entities = entities;
         this.width = entities.width();
@@ -53,9 +56,11 @@ public class Level implements Grid {
                         break;
                     case DoorPrevOpened:
                         elements.put(position, new Door(position, true, false));
+                        nextSuperiorDoor = position;
                         break;
                     case DoorNextOpened:
                         elements.put(position, new Door(position, true, true));
+                        nextInferiorDoor = position;
                         break;
                     case DoorNextClosed:
                         elements.put(position, new Door(position, false, true));
@@ -102,6 +107,22 @@ public class Level implements Grid {
 
     public boolean getPrincess() {
         return princess;
+    }
+
+    public Position getDoor(boolean isSuperior){
+        if (isSuperior){
+            return nextSuperiorDoor;
+        } else {
+            return nextInferiorDoor;
+        }
+    }
+
+    public void setDoor(Position position, boolean isSuperior){
+        if (!isSuperior){
+            nextSuperiorDoor = position;
+        } else {
+            nextInferiorDoor = position;
+        }
     }
 
     @Override

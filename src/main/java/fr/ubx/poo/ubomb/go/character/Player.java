@@ -43,7 +43,9 @@ public class Player extends Character implements Movable, TakeVisitor {
         if (next != null) {
             next.takenBy(this);
         }
-        setPosition(nextPos);
+        if (!(next instanceof Door)){
+            setPosition(nextPos);
+        }
     }
 
     public int getLives() {
@@ -70,8 +72,16 @@ public class Player extends Character implements Movable, TakeVisitor {
         this.lives += delta;
     }
 
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
     public Direction getDirection() {
         return direction;
+    }
+
+    public void teleport(Position position){
+        setPosition(position);
     }
 
     public void requestMove(Direction direction) {
@@ -109,7 +119,7 @@ public class Player extends Character implements Movable, TakeVisitor {
         if (next instanceof Door) {
             if (!((Door)next).isOpen() && getKeys() > 0) {
                 keys--;
-                ((Door)next).open();
+                ((Door)next).open(this.game);
                 ((Door)next).setModified(true);
             }
         }

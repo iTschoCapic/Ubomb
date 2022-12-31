@@ -2,6 +2,7 @@ package fr.ubx.poo.ubomb.go.decor.bonus;
 
 import fr.ubx.poo.ubomb.game.Position;
 import fr.ubx.poo.ubomb.go.character.Player;
+import fr.ubx.poo.ubomb.go.character.Monster;
 
 public class BombRange extends Bonus {
 
@@ -18,6 +19,11 @@ public class BombRange extends Bonus {
 
     @Override
     public void explode() {}
+
+    @Override
+    public boolean walkableBy(Monster monster) {
+        return false;
+    }
 
     @Override
     public void takenBy(Player player) {

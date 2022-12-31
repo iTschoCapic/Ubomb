@@ -1,6 +1,8 @@
 package fr.ubx.poo.ubomb.go.decor;
 
 import fr.ubx.poo.ubomb.game.Position;
+import fr.ubx.poo.ubomb.game.Direction;
+import fr.ubx.poo.ubomb.game.Game;
 import fr.ubx.poo.ubomb.go.character.Player;
 
 public class Door extends Decor {
@@ -14,8 +16,9 @@ public class Door extends Decor {
         this.isSuperior = isSuperior;
     }
 
-    public void open() {
+    public void open(Game game) {
         isOpen = true;
+        game.grid().setDoor(this.getPosition(), this.isSuperior());
     }
 
     public boolean isOpen() {
@@ -42,9 +45,12 @@ public class Door extends Decor {
                 if (player.game.getCurrentLevel() == 0){
                     return;
                 }
+
                 player.game.setCurrentLevel(-1);
                 player.game.update(1);
             }
+            player.setDirection(Direction.DOWN);
+            player.teleport(player.game.grid().getDoor(isSuperior));
         }
     }
 

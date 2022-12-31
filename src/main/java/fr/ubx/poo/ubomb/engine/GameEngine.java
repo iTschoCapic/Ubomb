@@ -44,7 +44,6 @@ public final class GameEngine {
     private Game game;
     private final Player player;
     private ArrayList<Monster> monsters;
-    private boolean isOnMonster;
     private final List<Sprite> sprites = new LinkedList<>();
     private final Set<Sprite> cleanUpSprites = new HashSet<>();
     private final Stage stage;
@@ -60,7 +59,6 @@ public final class GameEngine {
         this.game = game;
         this.player = game.player();
         this.monsters = game.getMonsters();
-        this.isOnMonster = false;
         this.playerTimer = new Timer(game.configuration().playerInvincibilityTime());
         initialize();
         buildAndSetGameLoop();
@@ -165,13 +163,11 @@ public final class GameEngine {
         for (Monster monster : monsters) {
             if (monster.game.getCurrentLevel() == currentLevel){
                 if (monster.getPosition().equals(player.getPosition())){
-                    if (!isOnMonster && !playerTimer.isRunning()){
-                        isOnMonster = true;
+                    if (!playerTimer.isRunning()){
                         player.updateLives(-1);
                         playerTimer.start();
                     }
                 } else {
-                    isOnMonster = false;
                     if (game.grid().get(player.getPosition()) instanceof Princess) {
                         gameLoop.stop();
                         showMessage("Gagné!", Color.RED);
