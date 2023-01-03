@@ -6,6 +6,7 @@ import fr.ubx.poo.ubomb.go.character.Player;
 import fr.ubx.poo.ubomb.launcher.MapLevel;
 import fr.ubx.poo.ubomb.launcher.MapRepoStringRLE;
 import fr.ubx.poo.ubomb.go.decor.*;
+import fr.ubx.poo.ubomb.go.decor.bonus.Bomb;
 import fr.ubx.poo.ubomb.game.Position;
 
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ public class Game {
     private final Configuration configuration;
     private final Player player;
     private ArrayList<Monster> monsters;
+    private ArrayList<Bomb> bombs;
     private Grid grid;
     private int currentLevel;
     private int maxLevel;
@@ -56,7 +58,7 @@ public class Game {
     }
 
     public Grid grid() {
-        return grid;
+        return this.grid;
     }
 
     public void update(int delta){
@@ -66,11 +68,7 @@ public class Game {
         this.loadedGrid[(getCurrentLevel()+delta)] = this.grid;
 
         if (this.loadedGrid[getCurrentLevel()] == null){
-            if (getCompression() == true){
-                this.loadedGrid[getCurrentLevel()] = new Level(mapRepoStringRLE.load(getWorldString(getCurrentLevel())));                    
-            } else {
-                this.loadedGrid[getCurrentLevel()] = new Level(mapRepoStringRLE.loadnoc(getWorldString(getCurrentLevel())));
-            }
+            this.loadedGrid[getCurrentLevel()] = new Level(mapRepoStringRLE.load(getWorldString(getCurrentLevel()), getCompression()));   
         }
         this.grid = loadedGrid[getCurrentLevel()];
     }
@@ -103,6 +101,11 @@ public class Game {
     public ArrayList<Monster> getMonsters() {
         updateMonsters();
         return this.monsters;
+    }
+
+    public ArrayList<Bomb> getBombs() {
+        this.bombs = grid.getBombs();
+        return this.bombs;
     }
 
     public void setCurrentLevel(int delta){
@@ -151,6 +154,12 @@ public class Game {
 
     public long getMonsterVelocity(){
         return this.monsterVelocity;
+    }
+
+    public void setMonstersTimers(long monsterInvincibilityTime){
+        for (Monster monster : getMonsters()){
+            monster.setTimer(monsterInvincibilityTime);
+        }
     }
 
 }

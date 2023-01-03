@@ -40,17 +40,19 @@ public class Sprite {
         if (this.gameObject instanceof Door){
             if (((Door) this.gameObject).isModified()){
                 if (((Door) this.gameObject).isOpen()){
-                    if (((Door) this.gameObject).isSuperior()){
+                    this.image = DOOR_OPENED.getImage();
+                    /*if (((Door) this.gameObject).isSuperior()){
                         this.image = DOOR_OPENED_PLUS.getImage();
                     } else {
                         this.image = DOOR_OPENED_MINUS.getImage();
-                    }
+                    }*/
                 } else {
-                    if (((Door) this.gameObject).isSuperior()){
+                    this.image = DOOR_CLOSED.getImage();
+                    /*if (((Door) this.gameObject).isSuperior()){
                         this.image = DOOR_CLOSED_PLUS.getImage();
                     } else {
                         this.image = DOOR_CLOSED_MINUS.getImage();
-                    }
+                    }*/
                 }
             }
         }

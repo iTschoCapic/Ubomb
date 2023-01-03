@@ -1,23 +1,16 @@
 <link rel="stylesheet" href="readme.css">
 
-
 # Projet de POO
 
 Réalisation d'un jeu vidéo 2D : **UBomb**.
-
-
-## INFO du 08/11/2022 
-
-Il y a un bug sur les machines Linux du CREMI exclusivement qui empêche la taille de la fenêtre de s'ajuster automatiquement à la taille de la carte. Pour y remédier dans l'immédiat, remplacer `stage.setResizable(false);` par `stage.setResizable(true);` dans la méthode `initialize` de la classe `GameEngine`.
 
 ## Principes du jeu
 
 Une princesse est détenue prisonnière par de méchants monstres verts. Votre mission, si vous l'acceptez, est d'aller la délivrer. Pour cela, vous devrez traverser plusieurs mondes, plus effrayants les uns que les autres. Des portes vous permettront de passer de monde en monde. Certaines portes seront fermées à clé et nécessiteront d'avoir une clé dans votre inventaire. Vous êtes un expert en explosif et utiliserez vos bombes pour détruire les obstacles devant vous et tuer les monstres qui vous attaqueront.
 
-
 ## Représentation du jeu
 
-Chaque monde est représenté par une carte (rectangulaire) composée de cellules. Chaque cellule peut contenir :
+Chaque monde est représenté par une carte (rectangulaire ou carré) composée de cellules. Chaque cellule peut contenir :
 
 -   le joueur ;
 -   la princesse ;
@@ -32,77 +25,36 @@ Chaque monde est représenté par une carte (rectangulaire) composée de cellule
 
 ![Bombeirb](img/ubomb.png)
 
-## Prise en main
-
-Nous vous fournissons une première ébauche du jeu, utilisant la bibliothèque JavaFX. Le lancement du jeu
-fait apparaître une carte minimaliste, chargée statiquement en mémoire, dans laquelle le joueur peut se déplacer dans toutes les directions, quelle que soit la nature des cellules. Le code utilise `gradle` comme moteur de production. Il suffit de lancer la commande suivante pour compiler et exécuter le jeu. Toutes les dépendances seront automatiquement téléchargées et installées. Le jeu nécessite une version de Java au moins égale à 14. La version 17 est recommandée car il s'agit de la dernière version LTS (*Long Term Support*). Pour utiliser Java 17 sur les machines du CREMI, il suffit d'exécuter la commande `source  /opt/local/bin/java17.env` dans votre fichier de configuration. 
-
-    $ ./gradlew run
-
-
-Le jeu utilise quelques fonctionnalités nouvelles de Java qui n'ont pas été vues en cours ou en TD :
-
-### Switch Expression (Java 13)
-
-Les expressions `Switch` peuvent désormais retourner une valeur et vous pouvez utiliser une syntaxe de style lambda. 
-
-```java
-boolean result = switch (status) {
-    case SUBSCRIBER -> true;
-    case FREE_TRIAL -> false;
-    default -> throw new IllegalArgumentException("something is murky!");
-};
-```
-
-### Records (Java 14)
-
-Il existe désormais des classes d'enregistrement (`record`) qui permettent de ne pas devoir écrire beaucoup de code pour manipuler des champs *immutables* (déclarés avec `final`). Ainsi le code suivant :
-
-```java
-final class Point {
-    private final int x;
-    private final int y;
-
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public int x() { return x; }
-    public int y() { return y; }
-
-    // state-based implementations of equals, hashCode, toString
-    // nothing else
-}
-```
-s'écrit simplement par :
-```java
-record Point(int x, int y) { }
-```
-
-
-### Pattern Matching pour InstanceOf (Java 14)
-
-Alors que précédemment vous deviez écrire :
-
-```java
-if (obj instanceof String) {
-    String s = (String) obj;
-    // use s
-}
-```
-
-vous pouvez maintenant écrire directement 
-```java
-if (obj instanceof String s) {
-    System.out.println(s.contains("hello"));
-}
-```
-
-Travail à fournir
+Cahier des charges
 =================
 
+## Base du jeu
+Les touches:
+- Les touches, `[ENTER]`, `[ESCAPE]`, ainsi que les flèches directionnelles fonctionnent.
 
+Monstres :
+- Déplacement aléatoire tous les `1e10 / monsterVelocity`, déplacement en direction du joueur pendant le niveau de la princesse (`Algorithme AStar`). Ils infligent 1 dégat dès qu'ils touchent un joueur. Si le joueur reste avec le monstre sur la case il prendra des dégats tous les `playerInvincibility`. Les monstres ont une vie en plus tous les deux niveaux, et se déplacent de plus en plus vite au fur et à mesure qu'on se rapproche de la princesse. A l'inverse la vitesse diminue en nous éloignant. Lorsque que l'on parle de rapprochement et d'éloignement, on parle en terme de niveau et non de cases nous séparant de la princesse. Les monstres peuvent marcher sur les bonus ainsi que les bombes sans les ramasser mais ne peuvent pas marche sur les portes (ouvertes ou non) et ils ne peuvent pas déplacer des caisses. Ils ne peuvent pas marcher sur la princesse.
+
+Joueur:
+- Ce dernier à un nombre de vie défini par le fichier `.properties`, si ce n'est pas le cas il en possède 5 par défaut. Il devient invincible dès qu'un monstre le touche (Comme pour ses vies, le temps d'invincibilité est variable et possède une valeur par défaut). Il possède un inventaire, clé, bombe, peuvent y être présents et être utilisés. Il peut marcher les portes ouvertes, marcher et ramasser les bonus, et marcher sur les monstres et la princesse. Au contact de cette dernière la partie se termine sur une victoire.
+
+Princesse:
+- Immobile, elle peut uniquement être en contact (se faire marcher dessus) avec le joueur.
+
+Décors:
+- Les décors sont infranchissables et immobiles sauf pour les caisses et les portes ouvertes. Ils peuvent être des arbres, des pierres, des portes, des caisses, une princesse.
+
+Bonus:
+- Les bonus sont fixes et récupérables par le joueur. Les monstres et le joueur peuvent marcher dessus. Ils peuvent être des coeurs, des clés, ou des bombes (et ses atouts).
+
+Mondes:
+- Générés par le `.properties`, ils peuvent être compresser ou non, le nombre peut changer, et les dimensions ne sont pas fixes (y compris entre les niveaux d'une même partie).
+
+Pour aller plus loin:
+- Nous avons réussi à faire la vie des monstres, ainsi que leurs déplacements sur le niveau de la princesse. Le dernier changeant la vitesse en fonction de la "distance" de la princesse est aussi fonctionnel (Si nous avons 5 niveaux et que la princesse est niveau 3, nous aurons, Niveau 1 vitesse de base, Niveau 2 = vitesse1 + 1, Niveau 3 = vitesse2 + 1, Niveau 4 = vitesse3 - 1 = vitesse2, Niveau 5 = vitesse4 - 1 = vitesse1).
+
+Rappel du Travail à fournir
+=================
 
 ## Premiers pas
 

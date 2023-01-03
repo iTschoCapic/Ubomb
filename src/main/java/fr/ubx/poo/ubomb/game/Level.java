@@ -18,6 +18,8 @@ public class Level implements Grid {
 
     private final ArrayList<Monster> monsters = new ArrayList<>();
 
+    private final ArrayList<Bomb> bombs = new ArrayList<>();
+
     private final Map<Position, Decor> elements = new HashMap<>();
 
     private boolean princess = false;
@@ -80,6 +82,9 @@ public class Level implements Grid {
                     case Monster:
                         monsters.add(new Monster(position));
                         break;
+                    case Bomb:
+                        bombs.add(new Bomb(position));
+                        break;
                     case Empty: break;
                     default:
                         throw new RuntimeException("EntityCode " + entity.name() + " not processed");
@@ -103,6 +108,10 @@ public class Level implements Grid {
 
     public ArrayList<Monster> getMonsters() {
         return monsters;
+    }
+
+    public ArrayList<Bomb> getBombs() {
+        return bombs;
     }
 
     public boolean getPrincess() {

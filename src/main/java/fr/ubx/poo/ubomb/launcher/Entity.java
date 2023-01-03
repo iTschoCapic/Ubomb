@@ -6,6 +6,7 @@ public enum Entity {
     Stone('S'),
     Tree('T'),
 
+    Bomb('b'),
     BombRangeInc('>'),
     BombRangeDec('<'),
     BombNumberInc('+'),

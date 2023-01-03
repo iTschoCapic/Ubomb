@@ -10,7 +10,7 @@ import static fr.ubx.poo.ubomb.launcher.Entity.*;
 public class MapRepoStringRLE implements MapRepo {
     private final char EOL = 'x';
     
-    private String compression(MapLevel mapLevel){
+    /*private String compression(MapLevel mapLevel){
         StringBuilder s = new StringBuilder();
         int count = 1;
         for(int i = 0; i < mapLevel.width(); i++){
@@ -43,7 +43,7 @@ public class MapRepoStringRLE implements MapRepo {
             s.append("x");
         }
         return s.toString();
-    }
+    }*/
 
     private String decompression(String string){
         StringBuilder s = new StringBuilder();
@@ -60,10 +60,12 @@ public class MapRepoStringRLE implements MapRepo {
     }
 
     @Override
-    public MapLevel load(String string) {
+    public MapLevel load(String string, boolean compressed) {
         int width = 0;
         int height = 0;
-        string = decompression(string);
+        if (compressed){
+            string = decompression(string);
+        }
         for (int i = 0; i < string.length();i++){
             if (string.charAt(i) == EOL){
                 width++;
@@ -88,7 +90,7 @@ public class MapRepoStringRLE implements MapRepo {
         return mapLevel;
     }
 
-    @Override
+    /*@Override
     public String export(MapLevel mapLevel) {
         String s = new String();
         s = compression(mapLevel);
@@ -96,7 +98,7 @@ public class MapRepoStringRLE implements MapRepo {
     }
 
     @Override
-    public MapLevel loadnoc(String string) {
+    public MapLevel loadnoc(String string) {return new MapLevel(0, 0);}
         int width = 0;
         int height = 0;
         for (int i = 0; i < string.length();i++){
@@ -142,6 +144,9 @@ public class MapRepoStringRLE implements MapRepo {
                 if (mapLevel.get(i, j) == Tree) {
                     s.append("T");
                 }
+                if (mapLevel.get(i, j) == Bomb){
+                    s.append("b");
+                }
                 if (mapLevel.get(i, j) == BombRangeInc) {
                     s.append(">");
                 }
@@ -179,6 +184,6 @@ public class MapRepoStringRLE implements MapRepo {
             s.append("x");
         }
         return s.toString();
-    }
+    }*/
 
 }

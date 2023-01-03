@@ -33,7 +33,7 @@ public class StatusBar {
         this.game = game;
 
         level.getStyleClass().add("level");
-        level.getChildren().add(new ImageView(ImageResourceFactory.digit(1).getImage()));
+        level.getChildren().add(new ImageView(ImageResourceFactory.digit(game.getCurrentLevel()+1).getImage()));
 
         ds.setRadius(5.0);
         ds.setOffsetX(3.0);

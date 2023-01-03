@@ -11,31 +11,27 @@ import fr.ubx.poo.ubomb.go.TakeVisitor;
 import fr.ubx.poo.ubomb.go.Takeable;
 import fr.ubx.poo.ubomb.go.decor.bonus.*;
 import fr.ubx.poo.ubomb.go.decor.*;
+import fr.ubx.poo.ubomb.engine.Timer;
 
 import java.util.List;
 import java.util.ArrayList;
 
 public class Monster extends Character {
 
-    private Direction direction;
-    private int lives = 1;
     private long lastMove = 0;
-    private long velocity = (long)1e9;
+    private long velocity = (long)1e10;
     public Game game = null;
-    private boolean requestMove = false;
     private boolean isRandom = true;
     private List<AStar.Node> path = new ArrayList<>();
     private AStar astar;
     private AStar.Node start;
     private AStar.Node end;
+    private Timer timer;
 
     public Monster(Position position) {
         super(position);
         this.direction = Direction.DOWN;
-    }
-
-    public Direction getDirection() {
-        return direction;
+        this.lives = 1;
     }
 
     @Override
@@ -68,7 +64,7 @@ public class Monster extends Character {
     }
 
     public void update(long now) {
-        if (requestMove == true){
+        if (moveRequested == true){
             if ((now - lastMove) > this.velocity) {
                 lastMove = now;
                 if (isRandom){
@@ -108,6 +104,14 @@ public class Monster extends Character {
         }
     }
 
+    public void setTimer(long time){
+        this.timer = new Timer(time);
+    }
+
+    public Timer getTimer(){
+        return this.timer;
+    }
+
     public void setRandom(boolean isRandom){
         this.isRandom = isRandom;
     }
@@ -120,20 +124,12 @@ public class Monster extends Character {
         this.game = game;
     }
 
-    public void setRequestMove(boolean status){
-        this.requestMove = status;
+    public void setMoveRequested(boolean status){
+        this.moveRequested = status;
     }
 
-    public boolean getRequestMove(){
-        return this.requestMove;
-    }
-
-    public void setLives(int delta){
-        this.lives = delta;
-    }
-
-    public int getLives(){
-        return this.lives;
+    public boolean getMoveRequested(){
+        return this.moveRequested;
     }
 
 }

@@ -4,7 +4,6 @@
 
 package fr.ubx.poo.ubomb.go.character;
 
-import fr.ubx.poo.ubomb.engine.Timer;
 import fr.ubx.poo.ubomb.game.Direction;
 import fr.ubx.poo.ubomb.game.Game;
 import fr.ubx.poo.ubomb.game.Position;
@@ -16,10 +15,7 @@ import fr.ubx.poo.ubomb.go.decor.*;
 
 public class Player extends Character implements Movable, TakeVisitor {
 
-    private Direction direction;
-    private boolean moveRequested = false;
-    private int lives;
-    private long invincibilityTime = 4000;
+    private long invincibilityTime;
     private boolean isInvincible = false;
     private int keys;
     private int availableBombs;
@@ -48,16 +44,14 @@ public class Player extends Character implements Movable, TakeVisitor {
         }
     }
 
-    public int getLives() {
-        return lives;
+    public void addAvailableBombs() {
+        if (availableBombs < bombBagCapacity){
+            this.availableBombs++;
+        }
     }
 
     public int getAvailableBombs() {
         return availableBombs;
-    }
-
-    public int getBombBagCapacity() {
-        return bombBagCapacity;
     }
 
     public int getBombRange() {
@@ -66,18 +60,6 @@ public class Player extends Character implements Movable, TakeVisitor {
 
     public int getKeys() {
         return keys;
-    }
-
-    public void updateLives(int delta) {
-        this.lives += delta;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public Direction getDirection() {
-        return direction;
     }
 
     public void teleport(Position position){
@@ -125,9 +107,19 @@ public class Player extends Character implements Movable, TakeVisitor {
         }
     }
 
-    @Override
-    public void explode() {
-        // TODO
+    public void useBomb(){
+        Position myPosition = this.getPosition();
+        GameObject here = game.grid().get(myPosition);
+        if (this.availableBombs > 0){
+            if (here == null) {
+                for (Monster monster : game.getMonsters()){
+                    if (monster.getPosition().equals(myPosition)){
+                        return;
+                    }
+                    this.availableBombs--;
+                }
+            }
+        }
     }
 
     //takes implementations

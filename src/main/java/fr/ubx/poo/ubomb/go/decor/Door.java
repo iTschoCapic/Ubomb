@@ -4,6 +4,7 @@ import fr.ubx.poo.ubomb.game.Position;
 import fr.ubx.poo.ubomb.game.Direction;
 import fr.ubx.poo.ubomb.game.Game;
 import fr.ubx.poo.ubomb.go.character.Player;
+import fr.ubx.poo.ubomb.go.decor.bonus.Bomb;
 
 public class Door extends Decor {
 
@@ -45,7 +46,6 @@ public class Door extends Decor {
                 if (player.game.getCurrentLevel() == 0){
                     return;
                 }
-
                 player.game.setCurrentLevel(-1);
                 player.game.update(1);
             }

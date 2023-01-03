@@ -10,11 +10,13 @@ import fr.ubx.poo.ubomb.game.Game;
 import fr.ubx.poo.ubomb.game.Position;
 import fr.ubx.poo.ubomb.go.character.*;
 import fr.ubx.poo.ubomb.go.decor.*;
+import fr.ubx.poo.ubomb.go.decor.bonus.*;
 import fr.ubx.poo.ubomb.view.ImageResource;
 import fr.ubx.poo.ubomb.view.Sprite;
 import fr.ubx.poo.ubomb.view.SpriteFactory;
 import fr.ubx.poo.ubomb.view.SpritePlayer;
 import fr.ubx.poo.ubomb.view.SpriteMonster;
+import fr.ubx.poo.ubomb.view.SpriteBomb;
 import fr.ubx.poo.ubomb.go.GameObject;
 import fr.ubx.poo.ubomb.launcher.GameLauncher;
 import javafx.animation.AnimationTimer;
@@ -53,6 +55,10 @@ public final class GameEngine {
     private int currentLevel = 0;
     private Timer playerTimer = new Timer(4000);
     private int princessLevel;
+    private List<Bomb> bombs = new ArrayList<>();
+    private boolean animationDone;
+    private List<Bomb> removeBombs = new ArrayList<>();
+    private List<Monster> monstersDeleted = new ArrayList<>();
 
     public GameEngine(Game game, final Stage stage) {
         this.stage = stage;
@@ -91,18 +97,28 @@ public final class GameEngine {
         sprites.clear();
         // Create sprites
         for (var decor : game.grid().values()) {
-            sprites.add(SpriteFactory.create(layer, decor));
-            decor.setModified(true);
+            if (!(decor instanceof Bomb)){
+                sprites.add(SpriteFactory.create(layer, decor));
+                decor.setModified(true);
+            }
         }
 
-        sprites.add(new SpritePlayer(layer, player));
+        bombs = game.getBombs();
+
+        for (Bomb bomb : bombs){
+            sprites.add(new SpriteBomb(layer, bomb));
+        }
+        
         for (Monster monster : monsters){
             monster.setGame(this.game);
             sprites.add(new SpriteMonster(layer, monster));
             if (monster.game.getCurrentLevel() == currentLevel){
-                monster.setRequestMove(true);
+                monster.setMoveRequested(true);
+                monster.setTimer(game.configuration().monsterInvincibilityTime());
             }
         }
+
+        sprites.add(new SpritePlayer(layer, player));
 
         if (game.princessInLevel()){
             game.setPrincessLevel(game.getCurrentLevel());
@@ -123,9 +139,8 @@ public final class GameEngine {
 
                 // Do actions
                 update(now);
-                createNewBombs(now);
                 checkCollision(now);
-                checkExplosions();
+                checkExplosions(now);
 
                 // Graphic update
                 cleanupSprites();
@@ -136,8 +151,36 @@ public final class GameEngine {
         };
     }
 
-    private void checkExplosions() {
-        // Check explosions of bombs
+    private void checkExplosions(long now) {
+        if (!bombs.isEmpty()){
+            for (Bomb bomb : bombs){
+                bomb.getTimer().update(now);
+                if (game.grid().get(bomb.getPosition()) instanceof Bomb && bomb.getTimer().remaining() <= 0){
+                    if (bomb.getIsInWorld()){
+                        animateExplosion(bomb.getPosition(), new Position(bomb.getPosition().getX(), bomb.getPosition().getY()));
+                        animateExplosion(bomb.getPosition(), new Position(bomb.getPosition().getX()+1, bomb.getPosition().getY()));
+                        animateExplosion(bomb.getPosition(), new Position(bomb.getPosition().getX(), bomb.getPosition().getY()+1));
+                        animateExplosion(bomb.getPosition(), new Position(bomb.getPosition().getX()-1, bomb.getPosition().getY()));
+                        animateExplosion(bomb.getPosition(), new Position(bomb.getPosition().getX(), bomb.getPosition().getY()-1));
+                    } else {
+                        bomb.isInWorld(true);
+                        
+                    }
+                    checkRangeCollisions(game.player().getBombRange(), bomb, now);
+                    game.grid().remove(bomb.getPosition());
+                    removeBombs.add(bomb);
+                    bomb.remove();
+                    game.player().addAvailableBombs();
+                    
+                }
+                bomb.setModified(true);
+            }
+            if (!removeBombs.isEmpty()){
+                bombs.removeAll(removeBombs);
+                sprites.remove(removeBombs);
+                removeBombs.clear();
+            }
+        }
     }
 
     private void animateExplosion(Position src, Position dst) {
@@ -155,7 +198,63 @@ public final class GameEngine {
     }
 
     private void createNewBombs(long now) {
-        // Create a new Bomb is needed
+        if (game.grid().get(player.getPosition()) == null){
+            Bomb bomb = new Bomb(player.getPosition());
+            game.grid().set(player.getPosition(), bomb);
+            sprites.add(new SpriteBomb(layer, bomb));
+            bomb.getTimer().start();
+            bombs.add(bomb);
+        }
+    }
+
+    private void checkRangeCollisions(int range, Bomb bomb, long now){
+
+        boolean notDestroyed1 = true;
+        boolean notDestroyed2 = true;
+        boolean notDestroyed3 = true;
+        boolean notDestroyed4 = true;
+        
+        for (int i = 0; i < range;i++){
+            Position pos1 = new Position(bomb.getPosition().getX()+range, bomb.getPosition().getY());
+            Position pos2 = new Position(bomb.getPosition().getX(), bomb.getPosition().getY()+range);
+            Position pos3 = new Position(bomb.getPosition().getX()-range, bomb.getPosition().getY());
+            Position pos4 = new Position(bomb.getPosition().getX(), bomb.getPosition().getY()-range);
+
+            playerTimer.update(now);
+            if (!playerTimer.isRunning() && (player.getPosition().equals(pos1) || player.getPosition().equals(pos2) || player.getPosition().equals(pos3) || player.getPosition().equals(pos4) || player.getPosition().equals(bomb.getPosition()))){
+                player.updateLives(-1);
+                playerTimer.start();
+            }
+
+            for (Monster monster : monsters){
+                monster.getTimer().update(now);
+                if (!monster.getTimer().isRunning() && (monster.getPosition().equals(pos1) || monster.getPosition().equals(pos2) || monster.getPosition().equals(pos3) || monster.getPosition().equals(pos4) || player.getPosition().equals(bomb.getPosition()))){
+                    monster.updateLives(-1);
+                    monster.getTimer().start();
+                }
+            }
+            GameObject obj1 = game.grid().get(pos1);
+            GameObject obj2 = game.grid().get(pos2);
+            GameObject obj3 = game.grid().get(pos3);
+            GameObject obj4 = game.grid().get(pos4);
+            if ((obj1 instanceof Box || obj1 instanceof Bonus) && notDestroyed1){
+                obj1.remove();
+                notDestroyed1 = false;
+            }
+            if ((obj2 instanceof Box || obj2 instanceof Bonus) && notDestroyed2){
+                obj2.remove();
+                notDestroyed2 = false;
+            }
+            if ((obj3 instanceof Box || obj3 instanceof Bonus) && notDestroyed3){
+                obj3.remove();
+                notDestroyed3 = false;
+            }
+            if ((obj4 instanceof Box || obj4 instanceof Bonus) && notDestroyed4){
+                obj4.remove();
+                notDestroyed4 = false;
+            }
+        }
+        
     }
 
     private void checkCollision(long now) {
@@ -199,6 +298,9 @@ public final class GameEngine {
             player.requestMove(Direction.UP);
         } else if (input.isKey()) {
             player.useKey();
+        } else if (input.isBomb()){
+            player.useBomb();
+            createNewBombs(now);
         }
         input.clear();
     }
@@ -224,10 +326,16 @@ public final class GameEngine {
     private void update(long now) {
         playerTimer.update(now);
         for (Monster monster : monsters){
-            if (monster.getRequestMove() == true){
+            if (monster.getMoveRequested() == true){
                 monster.update(now);
             }
+            if (monster.getLives() == 0){
+                monster.remove();
+                monstersDeleted.add(monster);
+            }
         }
+        monsters.removeAll(monstersDeleted);
+        monstersDeleted.clear();
         player.update(now);
         if (player.getLives() == 0) {
             gameLoop.stop();
@@ -246,6 +354,10 @@ public final class GameEngine {
                 } else {
                     game.setMonsterVelocity(game.getMonsterVelocity(), -1, currentLevel);
                 }
+            }
+
+            for (Bomb bomb : bombs){
+                bomb.isInWorld(false);
             }
             
             currentLevel = game.getCurrentLevel();

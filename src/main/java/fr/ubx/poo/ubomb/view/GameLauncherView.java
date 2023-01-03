@@ -37,9 +37,13 @@ public class GameLauncherView extends BorderPane {
     }
 
     private Position playerProperty(Properties config, String name, String defaultValue) {
-        int n = defaultValue.length()/2;
         String string = config.getProperty(name, defaultValue);
-        return new Position(Integer.parseInt(string.substring(0, n)), Integer.parseInt(string.substring(n+1)));
+        for (int i = 0; i < string.length();i++){
+            if (string.charAt(i) == 'x'){
+                return new Position(Integer.parseInt(string.substring(0, i)), Integer.parseInt(string.substring(i+1)));
+            }
+        }
+        return new Position(0,0); // Default value is 0x0
     }
 
     private String worldProperty(Properties config, String name, String defaultValue) {
@@ -84,27 +88,24 @@ public class GameLauncherView extends BorderPane {
                         boolean compression = booleanProperty(config, "compression", false);
                         int bombBagCapacity = integerProperty(config, "bombBagCapacity", 3);
                         int playerLives = integerProperty(config, "playerLives", 5);
-                        long playerInvisibilityTime = longProperty(config, "playerInvisibilityTime", 4000);
+                        long playerInvinsibilityTime = longProperty(config, "playerInvinsibilityTime", 4000);
                         int monsterVelocity = integerProperty(config, "monsterVelocity", 5);
-                        long monsterInvisibilityTime = longProperty(config, "monsterInvisibilityTime", 1000);
-                        configuration = new Configuration(playerPosition, bombBagCapacity, playerLives, playerInvisibilityTime, monsterVelocity, monsterInvisibilityTime);
+                        long monsterInvincibilityTime = longProperty(config, "monsterInvincibilityTime", 1000);
+                        configuration = new Configuration(playerPosition, bombBagCapacity, playerLives, playerInvinsibilityTime, monsterVelocity, monsterInvincibilityTime);
                         
                         int worldNumber = integerProperty(config, "levels", 1);
                         String[] worldString = new String[worldNumber];
                         for(int i = 0; i < worldNumber; i++){
                             worldString[i] = worldProperty(config, "level"+(i+1), "x");
                             this.mapLevel[i] = new MapLevel(0, 0);
-                            if (compression == true){
-                                this.mapLevel[i] = mapRepoStringRLE.load(worldString[i]);
-                            } else {
-                                this.mapLevel[i] = mapRepoStringRLE.loadnoc(worldString[i]);
-                            }
+                            this.mapLevel[i] = mapRepoStringRLE.load(worldString[i], compression);
                         }
                         
                         Game game = GameLauncher.load(configuration, this.mapLevel[0]);
                         game.setWorldString(worldString);
                         game.setMaxLevel(worldNumber);
                         game.setCompression(compression);
+                        game.setMonstersTimers(monsterInvincibilityTime);
                         GameEngine engine = new GameEngine(game, stage);
                         engine.start();
                     } catch(IOException IOex){
@@ -116,23 +117,6 @@ public class GameLauncherView extends BorderPane {
                 }
             }
         });
-
-        /* To complete if we have time // Export as file should be accessible from edit mode or a keyboard shortcut
-        exportItem.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            File file = fileChooser.showSaveDialog(stage);
-            if (file != null) {
-                try {
-                    Writer out = new FileWriter(file);
-                    GameLauncher.export(out, configuration, this.mapLevel); // Sauvegarde dans un fichier
-                } catch(FileNotFoundException FNFEex) {
-                    return;
-                } catch(IOException IOex){
-                    return;
-                }
-            }
-        });*/
-
 
         defaultItem.setOnAction(e -> {
             Game game = GameLauncher.loadDefault();
